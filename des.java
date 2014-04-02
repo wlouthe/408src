@@ -104,17 +104,6 @@ public class des
     
     
      // fill your code here, the return value should be put into round_key_gen
-      /*
-      boolean Ci[] = {key[57], key[49], key[41], key[33], key[25], key[17], key[9],
-                    key[1], key[58], key[50], key[42], key[34], key[26], key[18],
-                    key[10], key[2], key[59], key[51], key[43], key[35], key[27],
-                    key[19], key[11], key[3], key[60], key[52], key[44], key[36]};
-      
-      boolean Di[] = {key[63], key[55], key[47], key[39], key[31], key[23], key[15],
-                    key[7], key[62], key[54], key[46], key[38], key[30], key[22],
-                    key[14], key[6], key[61], key[53], key[45], key[37], key[29],
-                    key[21], key[13], key[5], key[28], key[20], key[12], key[4]};
-       //*/
       
       boolean Ci[] = new boolean[28];
       boolean Di[] = new boolean[28];
@@ -134,7 +123,6 @@ public class des
     {
         myVi = 2;
         
-        //*
         if(i==1 || i == 2 || i == 9 || i == 16)
         {
             myVi--;
@@ -148,8 +136,6 @@ public class des
             dOverflow[0] = Di[0];
             dOverflow[1] = Di[1];
         }
-        
-        //*
         for(int j = 0; j<28-myVi; j++)
         {
             Ci[j] = Ci[j+myVi];
@@ -160,20 +146,8 @@ public class des
             Ci[j] = cOverflow[j-(28-myVi)];
             Di[j] = dOverflow[j-(28-myVi)];
         }
-        /*
-        for(int j = 0; j<28; j++)
-        {
-            myT[j] = Ci[j];
-        }
-        for(int j = 0; j<28; j++)
-        {
-            myT[j+28] = Di[j];
-        }
-         //*/
         for(int j=0; j<48;j++)
         {
-            
-            //round_key_gen[i-1][j] = myT[PC2[j]-1];
             if(PC2[j]-1<28)
             {
                 round_key_gen[i-1][j] = Ci[PC2[j]-1];
@@ -184,53 +158,6 @@ public class des
             }
             
         }
-        //*/
-        /*
-        if(i==1 || i == 2 || i == 9 || i == 16)
-        {
-            myVi--;
-            cOverflow[0] = Ci[27];
-            dOverflow[0] = Di[27];
-        }
-        else
-        {
-            cOverflow[0] = Ci[26];
-            cOverflow[1] = Ci[27];
-            dOverflow[0] = Di[26];
-            dOverflow[1] = Di[27];
-        }
-        for(int j = 27; j>0+(myVi-1); j--)
-        {
-            Ci[j] = Ci[j-myVi];
-            Di[j] = Di[j-myVi];
-        }
-        for(int j = 0+(myVi-1); j>-1; j--)
-        {
-            Ci[j] = cOverflow[j];
-            Di[j] = dOverflow[j];
-        }
-        for(int j = 0; j<28; j++)
-        {
-            myT[j] = Ci[j];
-        }
-        for(int j = 0; j<28; j++)
-        {
-            myT[j+28] = Di[j];
-        }
-        for(int j=0; j<48;j++)
-        {
-            
-            round_key_gen[i-1][j] = myT[PC2[j]-1];
-            
-        }
-        //*/
-        //System.out.println("\n\n\nC1");
-        //showBooleanArray(Ci);
-        //System.out.println("\nD2");
-        //showBooleanArray(Di);
-        //System.out.println("\ne3");
-        //showBooleanArray(round_key_gen[i-1]);
-        //System.out.println("\nend");
     }
     
     return round_key_gen;
