@@ -123,7 +123,7 @@ public class des
       //defines an overflow array, allowing up to 2 digits to be stored for later so that they may be stored at the opposite side of the list after all other number are shifted.
       boolean cOverflow[] = new boolean[2];
       boolean dOverflow[] = new boolean[2];
-    for(int i = 1; i<21; i++)
+    for(int i = 1; i<KEY_NO+1; i++)
     {
         //initially declared Vi as 2
         myVi = 2;
@@ -429,6 +429,51 @@ public class des
     
     // fill your code here
     
+      //declare vars (myL represents left half, myR right half, xpndR is R after expanding but before sboxing, and sboxR is R after sboxs)
+      boolean myL[] = new boolean[HALF_LENGTH];
+      boolean myR[] = new boolean[HALF_LENGTH];
+      boolean xpndR[] = new boolean[ROUND_KEY_LENGTH];
+      boolean sboxR[] = new boolean[HALF_LENGTH];
+      
+      //assign the first half of the block to myL
+      for(int i = 0;i<HALF_LENGTH; i++)
+      {
+          myL[i] = block[i];
+      }
+      //assign the second half the the block to myR
+      for(int i = HALF_LENGTH;i<BLOCK_LENGTH; i++)
+      {
+          myR[i-HALF_LENGTH] = block[i];
+      }
+      
+      ///////////////////////////////////////////////////////////
+      // BEGIN F FUNCTION
+      ///////////////////////////////////////////////////////////
+      //expand myR to 48 bits
+      xpndR = Expansion(myR);
+      //xor 48bit myR with round key
+      xpndR = XOR(xpndR,round_key);
+      //use sbox substitution to reduce myR back to 32 bit
+      sboxR = SboxesSubstitution(xpndR);
+      //reorder myR according to the permutation
+      sboxR = Permutation_f(sboxR);
+      ///////////////////////////////////////////////////////////
+      // END F FUNCTION
+      ///////////////////////////////////////////////////////////
+      
+      // XOR myL with the product of F function on myR
+      myL = XOR(myL,sboxR);
+      
+      //return both myL and myR to one array, after swaping the order.
+      for(int i = 0;i<HALF_LENGTH; i++)
+      {
+          block_after_one_round[i] = myR[i];
+      }
+      for(int i = HALF_LENGTH;i<BLOCK_LENGTH; i++)
+      {
+          block_after_one_round[i] = myL[i-HALF_LENGTH];
+      }
+      
     return block_after_one_round;
   
   }
@@ -452,6 +497,7 @@ public class des
     
     // fill your code here
     
+      //reorders block according to ip_inverse
       for(int i=0;i<BLOCK_LENGTH;i++)
       {
           block_inverse_ip[i] = block[IP_INVERSE[i]-1];
@@ -484,7 +530,36 @@ public class des
     }
     
     // fill your code here
-    
+      
+      //generate KeySchedule
+      boolean KeySchedule[][] = Key_Schedule(key);
+      //perform initial permutation on block
+      cypher_text = Initial_Permutation(block);
+      //perform KEY_NO rounds with each respective round key
+      for(int i=0; i<KEY_NO; i++)
+      {
+          cypher_text = One_Round(cypher_text,KeySchedule[i]);
+      }
+      
+      //declare tmp to perform last irregular swap
+      boolean tmp[] = new boolean[HALF_LENGTH];
+      
+      //store the first half in tmp
+      for(int i = 0; i< HALF_LENGTH; i++)
+      {
+          tmp[i] = cypher_text[i];
+      }
+      //move the second half to the first half, and while the second half is being switched replace with the original first half stored in tmp.
+      for(int i=HALF_LENGTH;i<BLOCK_LENGTH;i++)
+      {
+          cypher_text[i-HALF_LENGTH] = cypher_text[i];
+          cypher_text[i] = tmp[i-HALF_LENGTH];
+      }
+      
+      //perform the final inverse of the initial permutation
+      cypher_text = Inverse_IP(cypher_text);
+      
+      //end my code
     return cypher_text;
     
   }
@@ -514,6 +589,38 @@ public class des
     
     // fill your code here
     
+      
+      //since decryption is the inverse of encryption, this shall be the same function as encryption other than inverting the round key order.
+      
+      //generate KeySchedule
+      boolean KeySchedule[][] = Key_Schedule(key);
+      //perform initial permutation on block
+      plain_text = Initial_Permutation(block);
+      //perform KEY_NO rounds with each respective round key, in decryption start from the max key index and go to the first one
+      for(int i=KEY_NO-1; i>-1; i--)
+      {
+          plain_text = One_Round(plain_text,KeySchedule[i]);
+      }
+      
+      //declare tmp to perform last irregular swap
+      boolean tmp[] = new boolean[HALF_LENGTH];
+      
+      //store the first half in tmp
+      for(int i = 0; i< HALF_LENGTH; i++)
+      {
+          tmp[i] = plain_text[i];
+      }
+      //move the second half to the first half, and while the second half is being switched replace with the original first half stored in tmp.
+      for(int i=HALF_LENGTH;i<BLOCK_LENGTH;i++)
+      {
+          plain_text[i-HALF_LENGTH] = plain_text[i];
+          plain_text[i] = tmp[i-HALF_LENGTH];
+      }
+      
+      //perform the final inverse of the initial permutation
+      plain_text = Inverse_IP(plain_text);
+      
+      //end my code
     return plain_text;
     
   }
@@ -774,6 +881,13 @@ public class des
       d.writeBooleanArrayToFile(fw, plain_text);
       System.out.print("\n\n");
       fw.write("\n\n");
+        
+        d.showBooleanArray(d.getBooleanArray(args[1]));
+        System.out.print("\n\n");
+        d.showBooleanArray(d.encryption_DES(d.getBooleanArray(args[1]), d.getBooleanArray(args[0])));
+        System.out.print("\n\n");
+        d.showBooleanArray(d.decryption_DES(d.encryption_DES(d.getBooleanArray(args[1]), d.getBooleanArray(args[0])), d.getBooleanArray(args[0])));
+        System.out.print("\n\n");
     
     
       // close the output file
