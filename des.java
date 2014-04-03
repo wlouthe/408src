@@ -62,7 +62,7 @@ public class des
   {13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9}}; /*corresponding to table7.8*/
   private static final int S3[][] = {{10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8}, 
   {13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1}, 
-  {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7}, 
+  {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7},
   {1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12}}; /*corresponding to table7.8*/
   private static final int S4[][] = {{7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15}, 
   {13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9}, 
@@ -159,6 +159,8 @@ public class des
             
         }
     }
+      
+      //end my code
     
     return round_key_gen;
   
@@ -183,6 +185,12 @@ public class des
     
     // fill your code here
     
+      for(int i=0;i<BLOCK_LENGTH;i++)
+      {
+          block_after_ip[i] = block[IP[i]-1];
+      }
+      
+      //end my code
   
     return block_after_ip;
   }
@@ -206,6 +214,13 @@ public class des
     
     
     // fill your code here
+      
+      for(int i=0;i<ROUND_KEY_LENGTH;i++)
+      {
+          array_after_expand[i] = array[E[i]-1];
+      }
+      
+      //end my code
   
   
     return array_after_expand;
@@ -227,8 +242,14 @@ public class des
     }
     boolean result_xor[] = new boolean[array_1.length];
     
-    
     // fill your code here
+      
+      for(int i=0; i<array_1.length;i++)
+      {
+          result_xor[i] = (array_1[i]||array_2[i])&&!(array_1[i]&&array_2[i]);
+      }
+      
+      //end my code
     
     
     return result_xor;
@@ -255,8 +276,107 @@ public class des
     
     
     // fill your code here
-  
-    
+      int startPos=0;
+      int count = 0;
+      /*
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S1[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S2[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S3[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S4[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S5[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S6[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S7[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      endPos = startPos + 6;
+      while(startPos<endPos)
+      {
+          array_after_substitution[startPos] = S8[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
+          startPos++;
+      }
+      */
+      int x;
+      x = S1[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S2[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S3[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S4[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S5[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S6[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S7[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      count++;
+      x = S8[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      array_after_substitution[count*4] = ((x>>3)&1)==1;
+      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
+      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
+      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      
+      //end my code
     
     return array_after_substitution; 
   
@@ -334,6 +454,12 @@ public class des
     
     // fill your code here
     
+      for(int i=0;i<BLOCK_LENGTH;i++)
+      {
+          block_inverse_ip[i] = block[IP_INVERSE[i]-1];
+      }
+      
+      //end my code
   
     return block_inverse_ip;
   }
