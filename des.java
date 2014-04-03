@@ -278,55 +278,7 @@ public class des
     // fill your code here
       int startPos=0;
       int count = 0;
-      /*
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S1[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S2[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S3[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S4[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S5[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S6[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S7[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      endPos = startPos + 6;
-      while(startPos<endPos)
-      {
-          array_after_substitution[startPos] = S8[(array[startPos]&1)+(array[startPos]>>4)&2][(array[startPos]>>1)&15];
-          startPos++;
-      }
-      */
+      
       int x;
       x = S1[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
       array_after_substitution[count*4] = ((x>>3)&1)==1;
