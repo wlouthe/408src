@@ -882,13 +882,6 @@ public class des
       System.out.print("\n\n");
       fw.write("\n\n");
         
-        d.showBooleanArray(d.getBooleanArray(args[1]));
-        System.out.print("\n\n");
-        d.showBooleanArray(d.encryption_DES(d.getBooleanArray(args[1]), d.getBooleanArray(args[0])));
-        System.out.print("\n\n");
-        d.showBooleanArray(d.decryption_DES(d.encryption_DES(d.getBooleanArray(args[1]), d.getBooleanArray(args[0])), d.getBooleanArray(args[0])));
-        System.out.print("\n\n");
-    
     
       // close the output file
       fw.close();
