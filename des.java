@@ -105,24 +105,30 @@ public class des
     
      // fill your code here, the return value should be put into round_key_gen
       
+      //defines the two halfs the compose t
       boolean Ci[] = new boolean[28];
       boolean Di[] = new boolean[28];
+      // fills Ci with the half of the digits from "key", of which are specified for that particular location by PC1 (augmented for zero indexed arrays). 
       for(int i=0;i<28;i++)
       {
           Ci[i] = key[PC1[i]-1];
       }
       for(int i=0;i<28;i++)
       {
+          // fills Ci with the half of the digits from "key", of which are specified for that particular location by PC1 (augmented for zero indexed arrays). Starts from the second half of PC1
           Di[i] = key[PC1[i+28]-1];
       }
+      // this is the specified shift amount for any given key
       int myVi;
+      //defines an overflow array, allowing up to 2 digits to be stored for later so that they may be stored at the opposite side of the list after all other number are shifted.
       boolean cOverflow[] = new boolean[2];
       boolean dOverflow[] = new boolean[2];
-      boolean myT[] = new boolean[56];
     for(int i = 1; i<21; i++)
     {
+        //initially declared Vi as 2
         myVi = 2;
         
+        //for the specified cases 1,2,9,and 16, Vi is set to 1 and 1 digit of overflow is set for each array
         if(i==1 || i == 2 || i == 9 || i == 16)
         {
             myVi--;
@@ -131,21 +137,26 @@ public class des
         }
         else
         {
+            //otherwise 2 digits of overflow for each array are set.
             cOverflow[0] = Ci[0];
             cOverflow[1] = Ci[1];
             dOverflow[0] = Di[0];
             dOverflow[1] = Di[1];
         }
+        //iterates over the entire list, less the specified "Vi" so that there are no array out of bounds errors, every iteration shifting the values from each array Vi(1 or 2) to the left.
         for(int j = 0; j<28-myVi; j++)
         {
             Ci[j] = Ci[j+myVi];
             Di[j] = Di[j+myVi];
         }
+        //iterates over the last Vi(1 or 2) digits of arrays Ci and Di, setting the value equal to what it would have been if the overflow digits were circularly shifted as well.
         for(int j = 28-myVi; j<28; j++)
         {
             Ci[j] = cOverflow[j-(28-myVi)];
             Di[j] = dOverflow[j-(28-myVi)];
         }
+        
+        //according to the permutation PC2 and using a psudo concatenated (Ci,Di), these digits are then stored into the round key position for their respsective key.
         for(int j=0; j<48;j++)
         {
             if(PC2[j]-1<28)
@@ -185,6 +196,7 @@ public class des
     
     // fill your code here
     
+      //over the course of iterating over BLOCK_LENGTH, stores the value from block at the location specified by the initial permutation at that current iteration into the augmented list. 
       for(int i=0;i<BLOCK_LENGTH;i++)
       {
           block_after_ip[i] = block[IP[i]-1];
@@ -215,6 +227,8 @@ public class des
     
     // fill your code here
       
+      //simply takes the number stored in array as the position specified by E (adjusted for zero indexed array notation) at its respective part of the array
+      
       for(int i=0;i<ROUND_KEY_LENGTH;i++)
       {
           array_after_expand[i] = array[E[i]-1];
@@ -244,6 +258,7 @@ public class des
     
     // fill your code here
       
+      //performs the xor operation (i.e. A XOR B = (A OR B) AND NOT(A AND B)
       for(int i=0; i<array_1.length;i++)
       {
           result_xor[i] = (array_1[i]||array_2[i])&&!(array_1[i]&&array_2[i]);
@@ -276,57 +291,82 @@ public class des
     
     
     // fill your code here
-      int startPos=0;
+      // count allows for the relative position calculation for each of the different sized arrays.
       int count = 0;
       
+      // the comments for the first sbox will apply to each sbox step, only using a different "S"
+      
       int x;
+      
+      //the integer value that is stored in the S1 array is stored into x
+      //the position is calculated by taking bytes X----X out of a 6 bit value and truncating them down to just XX, and then converting that value into an integer, which serves as the first index, where as the second on is found by taking the boolean bits at -xxxx-, converting them to their integer values, shifing them the appropiate amount, and adding them together.
+      //Therefore for the first index of the array {1,1,0,1,0,0} provides int 1 and int 0, after shifting the first one left by 1 and adding the result is 10 in binary, or 2.
+      //The second index is the calculated by finding the prior specified values of the previous array 1, 0 ,1 ,0, converting them to ints, and then shifting them respectively by their distance from the end resulting in the binary numbers 1000, 000, 10, 0 and adding them resulting in the binary representation 1010 of the integer 10.
+      // the final result would be finding the number at position S1[2][10], which is 9, and therefore resulting in 110100 -> 1001 
       x = S1[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      
+      //after x is found, continuing from the previous example of x being 9, then the values of each of the numbers at a relative position from a multiple of count is shifted 3-their respective distance from count to the right therefore resulting in the numbers 1, 2, 4, and 9, and their corresponding binary representation 1,10, 100, 1001. Finally, this number is anded with 1 and tested against 1 to result in the following steps [1,10,100,1001->1,0,0,1->true,false,false,true] and then correspondingly stored into the new reduced array in order.
+      
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S2[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S3[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S4[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S5[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S6[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S7[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       count++;
+      
+      
       x = S8[((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      array_after_substitution[count*4] = ((x>>3)&1)==1;
-      array_after_substitution[(count*4)+1] = ((x>>2)&1)==1;
-      array_after_substitution[(count*4)+2] = ((x>>1)&1)==1;
-      array_after_substitution[(count*4)+3] = ((x)&1)==1;
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
       
       //end my code
     
@@ -353,7 +393,13 @@ public class des
     
     // fill your code here
  
-    
+      // simply substitute the value of array specified by P (accounting for zero indexed arrays) into array_after_permutation
+      for(int i=0;i<HALF_LENGTH;i++)
+      {
+          array_after_permutation[i] = array[P[i]-1];
+      }
+      
+    //end my code
     return array_after_permutation;
   }
   
