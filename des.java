@@ -298,6 +298,28 @@ public class des
       
       int x;
       
+      
+      ///////////////////////////////////////////////////////////////////////////////////
+      // alternate short code
+      ///////////////////////////////////////////////////////////////////////////////////
+      //*
+      
+      int[][][] master = {S1,S2,S3,S4,S5,S6,S7,S8};
+      
+      x = master[count][((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+      for(int i=0;i<4;i++)
+      {
+          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+      }
+      count++;
+      //*/
+      ///////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////
+
+      
+      /*
+      
       //the integer value that is stored in the S1 array is stored into x
       //the position is calculated by taking bytes X----X out of a 6 bit value and truncating them down to just XX, and then converting that value into an integer, which serves as the first index, where as the second on is found by taking the boolean bits at -xxxx-, converting them to their integer values, shifing them the appropiate amount, and adding them together.
       //Therefore for the first index of the array {1,1,0,1,0,0} provides int 1 and int 0, after shifting the first one left by 1 and adding the result is 10 in binary, or 2.
@@ -367,6 +389,7 @@ public class des
       {
           array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
       }
+      //*/
       
       //end my code
     
