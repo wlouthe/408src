@@ -305,13 +305,15 @@ public class des
       //*
       
       int[][][] master = {S1,S2,S3,S4,S5,S6,S7,S8};
-      
-      x = master[count][((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
-      for(int i=0;i<4;i++)
+      for(count=0; count<8; count++)
       {
-          array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+          x = master[count][((array[count*6]?1:0)<<1) + (array[(count*6)+5]?1:0)][((array[(count*6)+1]?1:0)<<3) + ((array[(count*6)+2]?1:0)<<2)+((array[(count*6)+3]?1:0)<<1)+(array[(count*6+4)]?1:0)];
+          for(int i=0;i<4;i++)
+          {
+              array_after_substitution[(count*4)+i] = ((x>>(3-i))&1)==1;
+          }
       }
-      count++;
+      //count++;
       //*/
       ///////////////////////////////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////////////////////////////
@@ -893,6 +895,7 @@ public class des
       System.out.printf("The cypher text to be decrypted is: ");
       fw.write("The cypher text to be decrypted is: ");
       d.showBooleanArray(cypher_text);
+      d.writeBooleanArrayToFile(fw, cypher_text);
       System.out.print("\n");
       fw.write("\n");
       System.out.printf("The key for decryption is: "+args[0]+"\n");
